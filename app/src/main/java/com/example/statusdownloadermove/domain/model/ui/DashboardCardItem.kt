@@ -1,4 +1,4 @@
-package com.example.statusdownloadermove.domain.model
+package com.example.statusdownloadermove.domain.model.ui
 
 import androidx.compose.ui.graphics.Color
 import com.example.statusdownloadermove.R

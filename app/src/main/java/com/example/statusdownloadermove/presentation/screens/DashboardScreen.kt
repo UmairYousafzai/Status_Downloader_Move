@@ -1,6 +1,5 @@
 package com.example.statusdownloadermove.presentation.screens
 
-import androidx.compose.animation.AnimatedContentScope.SlideDirection.Companion.End
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.statusdownloadermove.domain.model.DashboardCardItem
+import com.example.statusdownloadermove.domain.model.ui.DashboardCardItem
 import com.example.statusdownloadermove.presentation.uitls.getDashBoardCardItems
 
 

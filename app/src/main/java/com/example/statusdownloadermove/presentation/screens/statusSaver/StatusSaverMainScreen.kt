@@ -2,15 +2,10 @@ package com.example.statusdownloadermove.presentation.screens.statusSaver
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,16 +22,31 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.statusdownloadermove.R
 import com.example.statusdownloadermove.presentation.screens.DashBoardScreen
+import com.example.statusdownloadermove.presentation.uitls.getTabRows
 import com.example.statusdownloadermove.ui.theme.DarkGreen
 import com.example.statusdownloadermove.ui.theme.StatusDownloaderMoveTheme
+import com.google.accompanist.pager.*
+import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.JdkConstants.TabPlacement
 
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun StatusSaverMainScreen(
     navController: NavController
 ) {
+    val pagerState = rememberPagerState()
 
-    Header()
+    Column {
+        Header()
+        TabLayout(pagerState = pagerState)
+        HorizontalPager(
+            count = getTabRows().size,
+            state = pagerState,
+        ) {
+            getTabRows()[pagerState.currentPage].screen()
+        }
+    }
 
 }
 
@@ -72,6 +82,56 @@ fun Header(
         )
 
     }
+}
+
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun TabLayout(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState
+) {
+    TabRow(
+        selectedTabIndex = pagerState.currentPage,
+        indicator = { tabPositions ->
+            TabRowDefaults.Indicator(
+                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions = tabPositions),
+                color = Color.White
+            )
+        },
+        backgroundColor = DarkGreen,
+    ) {
+
+        CustomTabs(pagerState = pagerState)
+
+    }
+
+
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun CustomTabs(
+    modifier: Modifier = Modifier,
+    pagerState: PagerState
+) {
+    val coroutineState = rememberCoroutineScope()
+    getTabRows().forEachIndexed { index, tabRowItem ->
+        Tab(
+            selected = pagerState.currentPage == index,
+            onClick = { coroutineState.launch { pagerState.animateScrollToPage(index) } },
+            icon = {
+                Icon(
+                    painter = painterResource(id = tabRowItem.icon),
+                    contentDescription = tabRowItem.title
+                )
+            },
+            text = {
+                Text(text = tabRowItem.title)
+            }
+        )
+    }
+
 }
 
 @Preview(showBackground = true)

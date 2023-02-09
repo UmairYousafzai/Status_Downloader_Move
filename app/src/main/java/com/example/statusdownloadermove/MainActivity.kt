@@ -49,8 +49,6 @@ class MainActivity : ComponentActivity() {
                                 backgroundColor = Color.White,
                                 contentColor = MaterialTheme.colors.onPrimary,
                             )
-                        }else{
-                            null
                         }
                     },
                 ) {
