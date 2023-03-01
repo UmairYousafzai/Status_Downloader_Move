@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 
 
 @Composable
-fun SavedItemScreen()
+fun SavedItemScreen(uri:String)
 {
     Box(modifier = Modifier.fillMaxSize())
     {

@@ -1,6 +1,8 @@
 buildscript {
     ext {
         compose_ui_version = '1.2.0'
+        data_store_version = "1.0.0"
+
     }
     ext.hilt_version = '2.44'
 

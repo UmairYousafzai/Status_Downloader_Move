@@ -1,6 +1,5 @@
 package com.example.statusdownloadermove.presentation.uitls
 
-import androidx.compose.material.icons.Icons
 import com.example.statusdownloadermove.R
 import com.example.statusdownloadermove.domain.model.ui.DashboardCardItem
 import com.example.statusdownloadermove.domain.model.ui.TabRowItem
@@ -32,9 +31,18 @@ fun getDashBoardCardItems(): ArrayList<DashboardCardItem> =
     )
 
 
-fun getTabRows(): ArrayList<TabRowItem> =
+fun getTabRows(): List<TabRowItem> =
     arrayListOf(
-        TabRowItem("Photos", R.drawable.photo_icon, screen = { PhotosScreen() }),
-        TabRowItem("Videos", R.drawable.video_icon, screen = { VideoScreen() }),
-        TabRowItem("Saved", R.drawable.baseline_save_alt_24, screen = { SavedItemScreen() }),
+        TabRowItem(
+            "Photos",
+            R.drawable.photo_icon,
+            screen = { uri, navController -> PhotosScreen(uri, navController) }),
+        TabRowItem(
+            "Videos",
+            R.drawable.video_icon,
+            screen = { uri, navController -> VideoScreen(uri) }),
+        TabRowItem(
+            "Saved",
+            R.drawable.baseline_save_alt_24,
+            screen = { uri, navController -> SavedItemScreen(uri) }),
     )

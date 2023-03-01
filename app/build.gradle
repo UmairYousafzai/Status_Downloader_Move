@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id("com.google.dagger.hilt.android")
     id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.0'
 
 }
 
@@ -52,11 +53,12 @@ android {
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
-    implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation "androidx.activity:activity:1.2.0-alpha02"
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation 'androidx.compose.material:material:1.2.0'
+    implementation 'androidx.documentfile:documentfile:1.0.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -69,10 +71,25 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hilt_version")
     kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
     implementation "androidx.hilt:hilt-navigation-compose:1.1.0-alpha01"
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
+
+    /////************Glide**************\\\\\\
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
+
+    /////************Coil**************\\\\\\
+    implementation "io.coil-kt:coil-compose:2.1.0"
+
+    /////************JSON**************\\\\\\
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
 
     /////************Pager**************\\\\\\
     implementation "com.google.accompanist:accompanist-pager:0.23.0"
     implementation "com.google.accompanist:accompanist-pager-indicators:0.23.0"
+
+    implementation "androidx.datastore:datastore-preferences:$rootProject.data_store_version"
+
+
 
 }

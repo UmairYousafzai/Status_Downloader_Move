@@ -1,61 +1,100 @@
 package com.example.statusdownloadermove.presentation.screens.statusSaver
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.statusdownloadermove.R
-import com.example.statusdownloadermove.presentation.screens.DashBoardScreen
+import com.example.statusdownloadermove.domain.model.ui.TabRowItem
+import com.example.statusdownloadermove.presentation.dialogs.PermissionInfoDialog
 import com.example.statusdownloadermove.presentation.uitls.getTabRows
+import com.example.statusdownloadermove.presentation.viewModels.datastore.DataStoreViewModel
 import com.example.statusdownloadermove.ui.theme.DarkGreen
 import com.example.statusdownloadermove.ui.theme.StatusDownloaderMoveTheme
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
-import org.intellij.lang.annotations.JdkConstants.TabPlacement
-
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun StatusSaverMainScreen(
-    navController: NavController
-) {
+    navController: NavController,
+    dataStoreViewModel: DataStoreViewModel = hiltViewModel(),
+
+    ) {
+    val tabRowList by remember {
+        mutableStateOf(getTabRows())
+    }
     val pagerState = rememberPagerState()
+    val folderPath by remember {
+        dataStoreViewModel.folderPath
+    }
+    val context = LocalContext.current
+    dataStoreViewModel.getStatusFolderPath()
 
     Column {
-        Header()
-        TabLayout(pagerState = pagerState)
+        val requestPermissionLauncher =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val uri = result.data?.data
+                    Log.e("Status uri", "uri====> ${uri.toString()}")
+                    dataStoreViewModel.saveStatusFolderPath(uri.toString())
+                    saveFolderAccessPermission(uri, context)
+                }
+            }
+        StatusSaverHeader(navController = navController)
+        TabLayout(tabRowList, pagerState = pagerState)
         HorizontalPager(
-            count = getTabRows().size,
+            count = tabRowList.size,
             state = pagerState,
         ) {
-            getTabRows()[pagerState.currentPage].screen()
+            if (folderPath.isEmpty()) {
+                Dialog(
+                    onDismissRequest = { },
+                    content = {
+                        PermissionInfoDialog()
+                        {
+                            if (it) {
+                                requestStatusFolderAccessPermission(requestPermissionLauncher)
+                            }
+                        }
+                    },
+                )
+            } else {
+                tabRowList[currentPage].screen.invoke(folderPath, navController)
+            }
         }
     }
-
 }
 
 @Composable
-fun Header(
-    modifier: Modifier = Modifier
+fun StatusSaverHeader(
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
+
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(DarkGreen)
             .padding(10.dp),
@@ -67,7 +106,11 @@ fun Header(
                 painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
                 contentDescription = "back btn",
                 tint = Color.White,
-                modifier = Modifier.padding(5.dp)
+                modifier = Modifier
+                    .padding(5.dp)
+                    .clickable {
+                        navController.popBackStack()
+                    },
             )
 
             Text(
@@ -81,6 +124,7 @@ fun Header(
             contentDescription = "whats app icon"
         )
 
+
     }
 }
 
@@ -88,9 +132,11 @@ fun Header(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun TabLayout(
+    tabsList: List<TabRowItem>,
     modifier: Modifier = Modifier,
     pagerState: PagerState
 ) {
+
     TabRow(
         selectedTabIndex = pagerState.currentPage,
         indicator = { tabPositions ->
@@ -101,9 +147,7 @@ fun TabLayout(
         },
         backgroundColor = DarkGreen,
     ) {
-
-        CustomTabs(pagerState = pagerState)
-
+        CustomTabs(tabsList, pagerState = pagerState)
     }
 
 
@@ -112,11 +156,13 @@ fun TabLayout(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CustomTabs(
+    tabsList: List<TabRowItem>,
     modifier: Modifier = Modifier,
     pagerState: PagerState
 ) {
     val coroutineState = rememberCoroutineScope()
-    getTabRows().forEachIndexed { index, tabRowItem ->
+
+    tabsList.forEachIndexed { index, tabRowItem ->
         Tab(
             selected = pagerState.currentPage == index,
             onClick = { coroutineState.launch { pagerState.animateScrollToPage(index) } },
@@ -134,19 +180,3 @@ fun CustomTabs(
 
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    StatusDownloaderMoveTheme {
-        val navController = rememberNavController()
-        val scaffoldState = rememberScaffoldState()
-        Scaffold(
-            modifier = Modifier.background(Color.White),
-            scaffoldState = scaffoldState,
-
-            ) {
-            Header(modifier = Modifier.padding(it))
-        }
-    }
-
-}
